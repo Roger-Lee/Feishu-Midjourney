@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	config "midjourney/initialization"
 	"net/http"
 	"path/filepath"
+	"time"
 )
 
 const (
@@ -16,9 +18,14 @@ const (
 	appId           = "936929561302675456"
 )
 
+func generateNonce() string {
+	return fmt.Sprintf("%d", rand.New(rand.NewSource(time.Now().UnixNano())).Int63())
+}
+
 func GenerateImage(prompt string) error {
 	requestBody := ReqTriggerDiscord{
 		Type:          2,
+		Nonce:         generateNonce(),
 		GuildID:       config.GetConfig().DISCORD_SERVER_ID,
 		ChannelID:     config.GetConfig().DISCORD_CHANNEL_ID,
 		ApplicationId: appId,
@@ -52,6 +59,7 @@ func GenerateImage(prompt string) error {
 func Upscale(index int64, messageId string, messageHash string) error {
 	requestBody := ReqUpscaleDiscord{
 		Type:          3,
+		Nonce:         generateNonce(),
 		GuildId:       config.GetConfig().DISCORD_SERVER_ID,
 		ChannelId:     config.GetConfig().DISCORD_CHANNEL_ID,
 		MessageFlags:  0,
@@ -70,6 +78,7 @@ func Upscale(index int64, messageId string, messageHash string) error {
 func MaxUpscale(messageId string, messageHash string) error {
 	requestBody := ReqUpscaleDiscord{
 		Type:          3,
+		Nonce:         generateNonce(),
 		GuildId:       config.GetConfig().DISCORD_SERVER_ID,
 		ChannelId:     config.GetConfig().DISCORD_CHANNEL_ID,
 		MessageFlags:  0,
@@ -78,7 +87,7 @@ func MaxUpscale(messageId string, messageHash string) error {
 		SessionId:     "1f3dbdf09efdf93d81a3a6420882c92c",
 		Data: UpscaleData{
 			ComponentType: 2,
-			CustomId:      fmt.Sprintf("MJ::JOB::variation::1::%s::SOLO", messageHash),
+			CustomId:      fmt.Sprintf("MJ::JOB::low_variation::1::%s::SOLO", messageHash),
 		},
 	}
 
@@ -93,6 +102,7 @@ func MaxUpscale(messageId string, messageHash string) error {
 func Variate(index int64, messageId string, messageHash string) error {
 	requestBody := ReqVariationDiscord{
 		Type:          3,
+		Nonce:         generateNonce(),
 		GuildId:       config.GetConfig().DISCORD_SERVER_ID,
 		ChannelId:     config.GetConfig().DISCORD_CHANNEL_ID,
 		MessageFlags:  0,
@@ -111,6 +121,7 @@ func Variate(index int64, messageId string, messageHash string) error {
 func Reset(messageId string, messageHash string) error {
 	requestBody := ReqResetDiscord{
 		Type:          3,
+		Nonce:         generateNonce(),
 		GuildId:       config.GetConfig().DISCORD_SERVER_ID,
 		ChannelId:     config.GetConfig().DISCORD_CHANNEL_ID,
 		MessageFlags:  0,
@@ -129,6 +140,7 @@ func Reset(messageId string, messageHash string) error {
 func Describe(uploadName string) error {
 	requestBody := ReqTriggerDiscord{
 		Type:          2,
+		Nonce:         generateNonce(),
 		GuildID:       config.GetConfig().DISCORD_SERVER_ID,
 		ChannelID:     config.GetConfig().DISCORD_CHANNEL_ID,
 		ApplicationId: "936929561302675456",
